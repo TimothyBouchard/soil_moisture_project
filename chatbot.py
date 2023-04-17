@@ -16,8 +16,9 @@ with open("plants_modified.csv", "r") as f:
 # Create an instance of the PyEnchant spell checker
 
 spell_checker = SpellChecker()
-
+current_plant = None
 def respond(input_str):
+    global current_plant
     # Split the user input into individual words
     words = input_str.lower().split()
 
@@ -29,22 +30,140 @@ def respond(input_str):
         else:
             corrected_words.append(spell_checker.correction(word))
 
+# Try to find the plant name in the user input
+        # If the user says thanks, respond with a polite message
+    if "thanks" in input_str.lower() or "thank you" in input_str.lower():
+        current_plant = None
+        return random.choice([ "You're welcome! Do you have any more questions?","Let me know if i can further assist you"])
+
+
+    for word in corrected_words:
+        # Loop over each row in the data and try to match the user input to the plant names
+        for row in data:
+            plant_name = row[0].lower()
+            if word == plant_name or current_plant == plant_name:
+                # If there is a match, return the growth habit attribute for the plant
+                if any(keyword in corrected_words for keyword in ["Moisture", "moisture"]):
+                    return f"{row[1]}"    
+
+    for word in corrected_words:
+        # Loop over each row in the data and try to match the user input to the plant names
+        for row in data:
+            plant_name = row[0].lower()
+            if word == plant_name or current_plant == plant_name:
+                # If there is a match, return the growth habit attribute for the plant
+                if any(keyword in corrected_words for keyword in ["Nitrogen", "nitrogen", "fertalizer"]):
+                    return f"The best Nitrogen levels for {plant_name} is {row[2]}"    
+
+    for word in corrected_words:
+        # Loop over each row in the data and try to match the user input to the plant names
+        for row in data:
+            plant_name = row[0].lower()
+            if word == plant_name or current_plant == plant_name:
+                # If there is a match, return the growth habit attribute for the plant
+                if any(keyword in corrected_words for keyword in ["compaction" , "compaction"]):
+                    return f"{row[3]}"
+
+    for word in corrected_words:
+        # Loop over each row in the data and try to match the user input to the plant names
+        for row in data:
+            plant_name = row[0].lower()
+            if word == plant_name or current_plant == plant_name:
+                # If there is a match, return the growth habit attribute for the plant
+                if any(keyword in corrected_words for keyword in ["Type", "type"]):
+                    return f"{row[4]}"
+
+    for word in corrected_words:
+        # Loop over each row in the data and try to match the user input to the plant names
+        for row in data:
+            plant_name = row[0].lower()
+            if word == plant_name or current_plant == plant_name:
+                # If there is a match, return the growth habit attribute for the plant
+                if any(keyword in corrected_words for keyword in ["Temp", "temp", "temps", "Temps", "tempature", "Tempature"]):
+                    return f"{row[5]}"    
+
+    for word in corrected_words:
+        # Loop over each row in the data and try to match the user input to the plant names
+        for row in data:
+            plant_name = row[0].lower()
+            if word == plant_name or current_plant == plant_name:
+                # If there is a match, return the growth habit attribute for the plant
+                if any(keyword in corrected_words for keyword in ["time", "Time", "start"]):
+                    return f"{row[6]}"
+
+    for word in corrected_words:
+        # Loop over each row in the data and try to match the user input to the plant names
+        for row in data:
+            plant_name = row[0].lower()
+            if word == plant_name or current_plant == plant_name:
+                # If there is a match, return the growth habit attribute for the plant
+                if any(keyword in corrected_words for keyword in ["harvest", "Harvest", "pick"]):
+                    return f"{row[7]}"
+
+    for word in corrected_words:
+        # Loop over each row in the data and try to match the user input to the plant names
+        for row in data:
+            plant_name = row[0].lower()
+            if word == plant_name or current_plant == plant_name:
+                # If there is a match, return the growth habit attribute for the plant
+                if any(keyword in corrected_words for keyword in ["Climate", "climate", "area"]):
+                    return f"{row[8]}"
+    for word in corrected_words:
+        # Loop over each row in the data and try to match the user input to the plant names
+        for row in data:
+            plant_name = row[0].lower()
+            if word == plant_name or current_plant == plant_name:
+                # If there is a match, return the growth habit attribute for the plant
+                if any(keyword in corrected_words for keyword in ["Diseases", "diseases", "Disease","diseases"]):
+                    return f"{row[9]}"
+
+    for word in corrected_words:
+        # Loop over each row in the data and try to match the user input to the plant names
+        for row in data:
+            plant_name = row[0].lower()
+            if word == plant_name or current_plant == plant_name:
+                # If there is a match, return the growth habit attribute for the plant
+                if any(keyword in corrected_words for keyword in ["Pests", "pests", "Pest","pest"]):
+                    return f"{row[10]}"
+
+    for word in corrected_words:
+        # Loop over each row in the data and try to match the user input to the plant names
+        for row in data:
+            plant_name = row[0].lower()
+            if word == plant_name or current_plant == plant_name:
+                # If there is a match, return the growth habit attribute for the plant
+                if any(keyword in corrected_words for keyword in ["rid", "Rid", "kill","Kill","Solution","solution","medication","Solution","Medication"]):
+                    return f"{row[11]}"
+
+        # Loop over each row in the data and try to match the user input to the plant names
+    for word in corrected_words:
+        for row in data:
+            plant_name = row[0].lower()
+            if word == plant_name or current_plant == plant_name:
+                # If there is a match, return the growth habit attribute for the plant
+                if any(keyword in corrected_words for keyword in ["How", "how", "Plant","plant"]):
+                    return f"{row[12]}"
+
+
+
     # Try to find the plant name in the user input
     for word in corrected_words:
         # Loop over each row in the data and try to match the user input to the plant names
         for row in data:
             plant_name = row[0].lower()
-            if word == plant_name:
+            if word == plant_name or current_plant == plant_name:
                 # If there is a match, return the attributes for the plant
                 attributes = row[1:]
-                return '\n'.join([attr.split(':')[1].strip() if len(attr.split(':')) > 1 else attr.strip() for attr in attributes])
+                current_plant = plant_name
+                return random.choice ([f"Great! What about {plant_name} do you want to know?",f"Absolutly! What questions do you have about {plant_name}?"])
+                #return '\n'.join([attr.split(':')[1].strip() if len(attr.split(':')) > 1 else attr.strip() for attr in attributes])
     
     # If the user says thanks, respond with a polite message
     if "thanks" in input_str.lower() or "thank you" in input_str.lower():
         return "You're welcome! Do you have any more questions?"
 
     if "garden" in input_str.lower() or "create" in input_str.lower():
-        return "That's great! What kind of plants are you planning on growing?"
+        return random.choice([ "That's great! What kind of plants are you planning on growing?(since im only a beta i can only answer to one plant at a time)", "Fantastic idea! Do you have any specific plants in mind that you want to include in your garden?(since im only a beta i can only answer to one plant at a time)"])
 
     # If the user asks how the chatbot is doing, respond with a random message
     if "how are you" in input_str.lower():
@@ -110,7 +229,7 @@ def on_click(event=None):
         chat_history.insert(tk.END, char)
         chat_history.see(tk.END)
         chat_history.update_idletasks()
-        time.sleep(0.02)
+        time.sleep(0.01)
     chat_history.insert(tk.END, "\n\n")
     chat_history.see(tk.END)
     chat_history.configure(state=tk.DISABLED)
