@@ -1,0 +1,219 @@
+// This is Arduino/ESP32 Wemos d1 R32 bored
+#include <time.h>
+#include <WiFi.h>
+#include <SPI.h>
+#include <SD.h>
+
+
+const int moistureSensorPin = 36;
+const char* ssid = "BouchardFam";
+const char* password = "hillsong9021";
+const char* filename = "/Data.txt";
+const int chipSelect = 5;
+WiFiClient client;
+
+
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  SPI.begin();
+  SD.begin(chipSelect);
+
+  // Connect to WiFi network
+  Serial.println("Connecting to WiFi...");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+  }
+  Serial.println("Connected to WiFi");
+
+}
+
+// Function to convert Unix timestamp to formatted date and time string
+String convertUnixTimestamp(time_t unixTime) {
+  char buffer[20];
+  struct tm timeinfo;
+  localtime_r(&unixTime, &timeinfo);
+  strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
+  return String(buffer);
+}
+
+void loop() {
+  // Connect to OpenWeatherMap API
+  Serial.println("Connecting to OpenWeatherMap API...");
+  if (!client.connect("api.openweathermap.org", 80)) {
+    Serial.println("Failed to connect to OpenWeatherMap API");
+    return;
+  }
+  Serial.println("Connected to OpenWeatherMap API");
+
+  // Send HTTP request
+  String httpRequest = "GET /data/2.5/weather?q=weare,nh,us&appid=eec1334fe2e42e570f2c4827435b8ea4 HTTP/1.1\r\n";
+  httpRequest += "Host: api.openweathermap.org\r\n";
+  httpRequest += "Connection: close\r\n\r\n";
+  client.print(httpRequest);
+
+  // Wait for server response
+  Serial.println("Waiting for server response...");
+  while (!client.available()) {
+    delay(1000);
+    Serial.println("Waiting for server response...");
+  }
+
+  // Read server response and save to file
+  Serial.println("Reading server response...");
+  String response = client.readString();
+  Serial.println(response);
+  client.stop();
+
+  // Manually parse the JSON response and extract the data
+  String dateTime;
+  String description;
+  float temp;
+  float feelsLike;
+  float tempMin;
+  float tempMax;
+  float pressure;
+  float humidity;
+  float windSpeed;
+  int windDeg;
+  int cloudsAll;
+  int dryValue = 4095; // minimum sensor value when dry
+  int wetValue = 0; // maximum sensor value when wet
+
+
+
+
+  int i = response.indexOf("\"dt\":");
+  if (i != -1) {
+    i += 5; // skip past the "dt": part
+    int j = response.indexOf(',', i);
+    if (j != -1) {
+      String timestamp = response.substring(i, j);
+      dateTime = convertUnixTimestamp(timestamp.toInt());
+    }
+  }
+
+  i = response.indexOf("\"temp\":");
+  if (i != -1) {
+    i += 7; // skip past the "temp": part
+    int j = response.indexOf(',', i);
+    if (j != -1) {
+      temp = response.substring(i, j).toFloat();
+      temp = (temp * 9/5 - 459.67); 
+    }
+  }
+
+  i = response.indexOf("\"feels_like\":");
+  if (i != -1) {
+    i += 13; // skip past the "feels_like": part
+    int j = response.indexOf(',', i);
+    if (j != -1) {
+      feelsLike = response.substring(i, j).toFloat();
+      feelsLike = (feelsLike * 9/5 - 459.67);
+    }
+  }
+
+  i = response.indexOf("\"temp_min\":");
+  if (i != -1) {
+    i += 11; // skip past the "temp_min": part
+    int j = response.indexOf(',', i);
+    if (j != -1) {
+      tempMin = response.substring(i, j).toFloat();
+      tempMin = (tempMin * 9/5 - 459.67);
+    }
+  }
+
+  i = response.indexOf("\"temp_max\":");
+  if (i != -1) {
+    i += 11; // skip past the "temp_max": part
+    int j = response.indexOf(',', i);
+    if (j != -1) {
+      tempMax = response.substring(i, j).toFloat();
+      tempMax = (tempMax * 9/5 - 459.67);
+    }
+  }
+
+  i = response.indexOf("\"pressure\":");
+    if (i != -1) {
+      i += 11; // skip past the "pressure": part
+      int j = response.indexOf(',', i);
+      if (j != -1) {
+        pressure = response.substring(i, j).toFloat();
+    }
+  }
+
+  i = response.indexOf("\"humidity\":");
+    if (i != -1) {
+      i += 11; // skip past the "humidity": part
+      int j = response.indexOf(',', i);
+      if (j != -1) {
+        humidity = response.substring(i, j).toFloat();
+    }
+  }
+
+  i = response.indexOf("\"speed\": ");
+    if (i != -1) {
+      i += 9; // skip past the "speed": part
+      int j = response.indexOf(',', i);
+      if (j != -1) {
+        windSpeed = response.substring(i, j).toFloat();
+    }
+  }
+
+  i = response.indexOf("\"deg\":");
+    if (i != -1) {
+      i += 6; // skip past the "deg": part
+      int j = response.indexOf(',', i);
+      if (j != -1) {
+        windDeg = response.substring(i, j).toInt();
+    }
+  }
+
+  i = response.indexOf("\"all\":");
+    if (i != -1) {
+      i += 6; // skip past the "all": part
+      int j = response.indexOf('}', i);
+      if (j != -1) {
+        cloudsAll = response.substring(i, j).toInt();
+    }
+  }
+  int moistureValue = analogRead(moistureSensorPin);
+  int moisture = map(moistureValue, dryValue, wetValue, 0, 100);
+
+  Serial.print("Moisture Value: ");
+  Serial.println(moisture);
+
+
+  // Create a list to hold the extracted data
+  String dataList = "Date Time GMT : " + dateTime + ",";
+  dataList += "Soil Moisture :" + String(moisture) + ",";
+  dataList += "Temp Actual :" + String(temp) + ",";
+  dataList += "Temp Feel :" + String(feelsLike) + ",";
+  dataList += "Temp Min :" + String(tempMin) + ",";
+  dataList += "Temp Max :" + String(tempMax) + ",";
+  dataList += "Pressure :" + String(pressure) + ",";
+  dataList += "Humidity :" + String(humidity) + ",";
+  dataList += "Wind Speed :" + String(windSpeed) + ",";
+  dataList += "Wind Deg :" + String(windDeg) + ",";
+  dataList += "Clouds % :" + String(cloudsAll);
+
+
+  // Print the extracted data to Serial
+  Serial.println("Data: " + dataList);
+
+  // Write the extracted data to a file on the SD card
+  File file = SD.open(filename, FILE_APPEND);
+  if (file) {
+    file.println(dataList);
+    file.close();
+    Serial.println("Data written to file");
+  } else {
+    Serial.println("Error opening file");
+  }
+
+  // Wait for 1hr seconds before sending the next request
+  delay(3600000);
+}
