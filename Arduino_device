@@ -6,8 +6,8 @@
 
 
 const int moistureSensorPin = 36;
-const char* ssid = "BouchardFam";
-const char* password = "hillsong9021";
+const char* ssid = "SSSD";
+const char* password = "PASSWORD";
 const char* filename = "/Data.txt";
 const int chipSelect = 5;
 WiFiClient client;
@@ -50,7 +50,7 @@ void loop() {
   Serial.println("Connected to OpenWeatherMap API");
 
   // Send HTTP request
-  String httpRequest = "GET /data/2.5/weather?q=weare,nh,us&appid=eec1334fe2e42e570f2c4827435b8ea4 HTTP/1.1\r\n";
+  String httpRequest = "GET /data/2.5/weather?q=weare,nh,us&appid=API ID HTTP/1.1\r\n";
   httpRequest += "Host: api.openweathermap.org\r\n";
   httpRequest += "Connection: close\r\n\r\n";
   client.print(httpRequest);
