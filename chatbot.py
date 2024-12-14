@@ -4,22 +4,22 @@ import random
 import time
 import tkinter as tk
 from spellchecker import SpellChecker
-# Read in the CSV file and store the data in a list of tuples
+# Read in the CSV file and store the data
 data = []
 failed_attempts = 0;
 with open("plants_modified.csv", "r") as f:
     reader = csv.reader(f)
-    header = next(reader)  # Skip the header row
+    header = next(reader)  # Skip the header
     for row in reader:
         data.append(tuple(row))
 
-# Create an instance of the PyEnchant spell checker
+# Create spell checker
 
 spell_checker = SpellChecker()
 current_plant = None
 def respond(input_str):
     global current_plant
-    # Split the user input into individual words
+    # Split the user input into words
     words = input_str.lower().split()
 
     # Spellcheck the words and suggest corrections
