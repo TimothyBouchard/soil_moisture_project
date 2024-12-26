@@ -26,3 +26,5 @@ Wiring diagram will be available soon.
 
 future improvements to the device would be to add a i2c display to display some data, and a outlet powersupply other than my PC so i dont run up electric bill. Reasons for the 24 hour test.
 
+12/26/2024
+Edited files and took a look back into old project. To clarify this project turned into a garden chatbot
