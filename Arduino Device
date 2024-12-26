@@ -20,7 +20,7 @@ void setup() {
   SPI.begin();
   SD.begin(chipSelect);
 
-  // Connect to WiFi network
+  // Connect to WiFi
   Serial.println("Connecting to WiFi...");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -31,7 +31,7 @@ void setup() {
 
 }
 
-// Function to convert Unix timestamp to formatted date and time string
+// convert Unix timestamp to formatted date and time string
 String convertUnixTimestamp(time_t unixTime) {
   char buffer[20];
   struct tm timeinfo;
@@ -55,7 +55,7 @@ void loop() {
   httpRequest += "Connection: close\r\n\r\n";
   client.print(httpRequest);
 
-  // Wait for server response
+  // Wait for server
   Serial.println("Waiting for server response...");
   while (!client.available()) {
     delay(1000);
@@ -68,7 +68,7 @@ void loop() {
   Serial.println(response);
   client.stop();
 
-  // Manually parse the JSON response and extract the data
+  // parse the JSON
   String dateTime;
   String description;
   float temp;
@@ -187,7 +187,7 @@ void loop() {
   Serial.println(moisture);
 
 
-  // Create a list to hold the extracted data
+  // lists
   String dataList = "Date Time GMT : " + dateTime + ",";
   dataList += "Soil Moisture :" + String(moisture) + ",";
   dataList += "Temp Actual :" + String(temp) + ",";
@@ -201,10 +201,10 @@ void loop() {
   dataList += "Clouds % :" + String(cloudsAll);
 
 
-  // Print the extracted data to Serial
+  // Print data to Serial
   Serial.println("Data: " + dataList);
 
-  // Write the extracted data to a file on the SD card
+  // Write to SD card
   File file = SD.open(filename, FILE_APPEND);
   if (file) {
     file.println(dataList);
@@ -214,6 +214,6 @@ void loop() {
     Serial.println("Error opening file");
   }
 
-  // Wait for 1hr seconds before sending the next request
+  // Wait for 1hr
   delay(3600000);
 }
