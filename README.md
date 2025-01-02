@@ -28,3 +28,5 @@ future improvements to the device would be to add a i2c display to display some 
 
 12/26/2024
 Edited files and took a look back into old project. To clarify this project turned into a garden chatbot
+
+no major updates to the roject and will hope to resume in the future
